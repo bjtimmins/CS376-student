@@ -12,7 +12,7 @@ public class Orb : MonoBehaviour
     // ReSharper disable once UnusedMember.Local
     void OnBecameInvisible()
     {
-        // TODO
+        Destroy(this.gameObject);
     }
 
     /// <summary>
@@ -23,5 +23,9 @@ public class Orb : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         // TODO
+        if (collision.collider.name != "Orb(Clone)")
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

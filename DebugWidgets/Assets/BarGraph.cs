@@ -48,7 +48,7 @@ public class BarGraph : MonoBehaviour
     void Start()
     {
         // TODO: Set the text to the name of this game object
-        
+        Text.text = name;
         
         // This sets width to the width of the widget on screen
         var rectTransform = (RectTransform)transform;
@@ -65,7 +65,13 @@ public class BarGraph : MonoBehaviour
         //
         // Important: remember that This BarGraph component is in a different game object than the
         // Bar.  So they have different RectTransforms.  How do you get the transform for the bar?
-        
+        if (Min < 0)
+        {
+            signedDisplay = true;
+            //var locPos = rectTransform.localPosition;
+            //rectTransform.localPosition.Set(width / 2, locPos.y, locPos.z);
+            BarTransform.localPosition = new Vector2(width * 0.5f, BarTransform.localPosition.y);
+        }
     }
 
     /// <summary>
@@ -78,14 +84,24 @@ public class BarGraph : MonoBehaviour
         // TODO: Determine the color to display it in.
         // If it's out of range, display it in red
         // Otherwise, use green for positive values and blue for negative ones
-        var color = Color.green;
-        
+        var color = Color.red;
+        if (value <= Max & value >= 0)
+            color = Color.green;
+        else if(value < 0 & value >= Min)
+            color = Color.blue;
+
         // TODO: if value is out of range (less than Min, greater than Max),
         // then move it in range (set it to Min/Max) so the bar doesn't draw
         // outside the widget.
+        Text.text = $"{name} : {value}";
+
+        if (value > Max)
+            value = Max;
+        else if (value < Min)
+            value = Min;
 
         // TODO: Call SetWidthPercent to change the width of the bar and set its color
-        
+        SetWidthPercent(value, color);
         // TODO: Update the text to read: {name} : {value}
         
     }
@@ -96,18 +112,26 @@ public class BarGraph : MonoBehaviour
     /// value = 1 means it's maximum width
     /// value = -1 (signed display) means it's maximum width in the other direction
     /// </summary>
-    /// <param name="value">Percentage of the maxim</param>
+    /// <param name="value">Percentage of the maximum</param>
     /// <param name="c"></param>
     public void SetWidthPercent(float value, Color c)
     {
         // TODO: Set the color of the bar to c
-        
+        BarImage.color = c;
 
         // TODO: Change BarTransform.localScale so that its x component is scaled by value.
         // If we're using signedDisplay, then we also want to cut the scale by a half so we can 
         // have half the widget for positive values and half for negative ones.
         // Leave the localScale's y component as is.
-        
+        var scale = BarTransform.localScale;
+        if (value < 0)
+            scale.x = value / Math.Abs(Min);
+        else    
+            scale.x = value / Max;
+        if (signedDisplay)
+            scale.x = scale.x / 2;
+        //BarTransform.localScale.Set(scale.x, scale.y, scale.z);
+        BarTransform.localScale = new Vector3(scale.x, scale.y, scale.z);
     }
 
     #region Dynamic creation
@@ -130,7 +154,8 @@ public class BarGraph : MonoBehaviour
     public static BarGraph Find(string name, Vector2 position, float min, float max)
     {
         // TODO: Check if we've already made a bargraph of this name.  If so, return it.
-        
+        if (BarGraphTable.ContainsKey(name))
+            return BarGraphTable[name];
         //
         // Otherwise, we need to make a new one
         //
@@ -142,15 +167,19 @@ public class BarGraph : MonoBehaviour
         // TODO: Instantiate Prefab and put it inside of the game object that has the canvas.
         // Set its position to position and its rotation to the magic value Quaternion.identity, which means
         // "don't rotate it".
-        var go = null;  // Change null to a call to Instantiate
+        if (prefab == null)
+            prefab = Prefab;
+        var go = Instantiate(prefab, position, Quaternion.identity, canvas.transform);  // Change null to a call to Instantiate
 
         // TODO: Name the GameObject name
-        
+        go.name = name;
 
         // TODO: Get the BarGraph component from the game object we just made
-        var bgComponent = null;  // Change null here
+        var bgComponent = (BarGraph)go.transform.GetComponent("BarGraph");  // Change null here
 
         // TODO set bgComponent's Min and Max fields to min and max
+        bgComponent.Min = min;
+        bgComponent.Max = max;
         
         // Add the BarGraph component to the table
         BarGraphTable[name] = bgComponent;
@@ -167,7 +196,7 @@ public class BarGraph : MonoBehaviour
     {
         get
         {
-            // TODO: return prefab is null, set it to Resources.Load<GameObject>("BarGraph")
+            GameObject prefab = Resources.Load<GameObject>("BarGraph");
 
 
             // Now that prefab isn't null, we can return it.

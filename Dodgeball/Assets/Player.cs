@@ -11,20 +11,28 @@ public class Player : MonoBehaviour
     /// </summary>
     public GameObject OrbPrefab;
 
+    public Rigidbody2D RigidBody;
+
     /// <summary>
     /// How fast our engines can accelerate us
     /// </summary>
-    public float EnginePower = 1;
+    public float EnginePower = 1000;
     
     /// <summary>
     /// How fast we turn in place
     /// </summary>
-    public float RotateSpeed = 1;
+    public float RotateSpeed = 100;
 
     /// <summary>
     /// How fast we should shoot our orbs
     /// </summary>
-    public float OrbVelocity = 10;
+    public float OrbVelocity = 1000;
+
+    private void Start()
+    {
+        RigidBody = GetComponent<Rigidbody2D>();
+
+    }
 
 
     /// <summary>
@@ -38,6 +46,14 @@ public class Player : MonoBehaviour
     void Update()
     {
         // TODO
+        if (Input.GetAxis("Fire") > 0)
+        {
+            var right = RigidBody.transform.right;
+            var pos = new Vector2(RigidBody.position.x + right.x, RigidBody.position.y + right.y);
+            var go = Instantiate(OrbPrefab, pos, Quaternion.identity, RigidBody.transform);
+            go.GetComponent<Rigidbody2D>().velocity = right * OrbVelocity;
+        }
+        
     }
 
     /// <summary>
@@ -50,6 +66,15 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         // TODO
+        float x = Input.GetAxis("Horizontal");
+        float y = Input.GetAxis("Vertical");
+        Vector2 dir = new Vector2(x, y);
+        dir = dir * EnginePower;
+        RigidBody.AddForce(dir);
+
+        float RotateAxis = Input.GetAxis("Rotate");
+        float negRotate = Input.GetAxis()
+        RigidBody.angularVelocity = RotateSpeed * (1 + RotateAxis) / 2;
     }
 
     /// <summary>

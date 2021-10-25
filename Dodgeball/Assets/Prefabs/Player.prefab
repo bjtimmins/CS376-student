@@ -199,7 +199,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 100000
   m_LinearDrag: 0.9
   m_AngularDrag: 0.05
   m_GravityScale: 0
@@ -221,6 +221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   OrbPrefab: {fileID: 1346212635561485589, guid: 9361f375035c18b46b4b9ebd97c1091a, type: 3}
+  RigidBody: {fileID: 0}
   EnginePower: 10
   RotateSpeed: 300
   OrbVelocity: 10
@@ -236,3 +237,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d8a40a0894ad70438e852b5b16321d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FreeRadius: 10
